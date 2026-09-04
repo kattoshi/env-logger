@@ -1,0 +1,21 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Publish output
+publish/**
+!publish/.gitkeep
+
+## SQLite DB (ローカル/開発用DBはコミットしない)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+src/data/
+
+## VS Code
+.vs/
+.vscode/*
+!.vscode/extensions.json

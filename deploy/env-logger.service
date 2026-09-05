@@ -1,0 +1,23 @@
+[Unit]
+Description=EnvLogger environment monitor service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/env/env-logger/publish
+ExecStart=/home/env/env-logger/publish/EnvLogger
+Restart=on-failure
+RestartSec=5
+User=env
+Group=env
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://0.0.0.0:80
+Environment=DOTNET_ROOT=/home/env/.dotnet
+Environment=PATH=/home/env/.dotnet:/usr/bin:/bin
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

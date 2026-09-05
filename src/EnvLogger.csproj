@@ -8,6 +8,8 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <InvariantGlobalization>true</InvariantGlobalization>
     <RootNamespace>EnvLogger</RootNamespace>
+    <!-- -o未指定時、srcと並びのpublishフォルダへ出力する -->
+    <PublishDir>$(MSBuildProjectDirectory)/../publish/</PublishDir>
   </PropertyGroup>
 
   <ItemGroup>

@@ -13,4 +13,9 @@ public interface ILcdDisplay
     /// <param name="localTime">表示する現在時刻(ローカルタイム)。</param>
     /// <param name="snapshot">表示する環境計測値。</param>
     void Show(DateTime localTime, SensorSnapshot snapshot);
+
+    /// <summary>
+    /// 環境計測端末への接続エラーをLCDの1・2行目に表示します。
+    /// </summary>
+    void ShowError();
 }

@@ -47,12 +47,28 @@ public sealed class Hd44780I2cLcdDisplay : ILcdDisplay, IDisposable
 
         // 1行目: (hh:mm)9999.9hPa / 2行目: 99.9°C  999.9%
         var line1 = $"({localTime:HH:mm}){snapshot.Pressure,6:0.0}hPa";
-        var line2 = $"{snapshot.TempC,4:0.0}\u00B0C  {snapshot.Humidity,5:0.0}%";
+        var line2 = $"  {snapshot.TempC,4:0.0}C   {snapshot.Humidity,5:0.0}%";
 
         _lcd.SetCursorPosition(0, 0);
         _lcd.Write(line1);
         _lcd.SetCursorPosition(0, 1);
         _lcd.Write(line2);
+    }
+
+    /// <inheritdoc />
+    public void ShowError()
+    {
+        if (_lcd is null)
+        {
+            return;
+        }
+
+        // 通常表示より短い文字列を書くため、残留文字を消すためにクリアする
+        _lcd.Clear();
+        _lcd.SetCursorPosition(0, 0);
+        _lcd.Write("Error!! Measure");
+        _lcd.SetCursorPosition(0, 1);
+        _lcd.Write("Device Connect");
     }
 
     /// <inheritdoc />

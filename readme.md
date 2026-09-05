@@ -14,7 +14,7 @@
    固定少数点第二位を保持する
 
 ### 環境計測端末仕様
-- サーバー名：env-marure.local
+- サーバー名：env-measure.local
 - マシン：M5 Stack Atom3S lite
 - rest api 仕様
   - 現在環境値取得
@@ -33,6 +33,7 @@
 - 仕様
 - マシン：ラスペリパイ４
 - ホスト名：env-monitor.local
+- REST API リッスンポート：80(env-logger.serviceにて ASPNETCORE_URLS=http://0.0.0.0:80 を設定)
 
 #### ロガー機能
 - 毎時、0、10、20、30、40、50分に 環境計測端末へ現在環境値取得し、DB へ格納する。
@@ -116,10 +117,14 @@ REST API サーバーとして、以下のサービスを準備する
       - mm : 毎時分
       - 9999.9 : 気圧
   - ２行目
-    `99.9°C  999.9%`
+    `  99.9C   999.9%`
     - 項目
       - 99.9 : 気温(2桁,1桁)
       - 999.9 : 湿度(3桁,1桁) 
+- エラー表示
+  環境計測端末への接続に失敗した場合、通常表示の代わりに以下を表示し、接続が回復次第、通常表示へ戻す
+  - １行目 : `Error!! Measure`
+  - ２行目 : `Device Connect`
 
 ## アーキテクト
 - フレームワーク
@@ -130,10 +135,13 @@ REST API サーバーとして、以下のサービスを準備する
   レイヤードアーキテクチャー
 - 配置
   - ~/env-logger ... プロジェクトホーム
-    - src .... プログラムソース
+    - src .... プログラムソース(`dotnet publish -c Release` を `-o` 省略で実行すると publish フォルダへ出力される)
     - publish .... リリース物件
+    - deploy .... デプロイ関連ファイル(systemdユニットファイルなど)
 - サービス
-  env-logger.service として マシン起動時に起動する
+  - env-logger.service として マシン起動時に起動する
+  - ユニットファイルは deploy/env-logger.service を /etc/systemd/system/ へ配置して登録する
+  - DBファイル格納先の /var/lib/env-logger は事前に作成し、実行ユーザーに書き込み権限を付与しておく
 - ログ
   ストレージが sdcard なので、アクセスは極力少なくする
 

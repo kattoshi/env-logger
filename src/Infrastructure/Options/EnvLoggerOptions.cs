@@ -16,9 +16,9 @@ public sealed class EnvLoggerOptions
     public string DbPath { get; set; } = "logger.db";
 
     /// <summary>
-    /// 環境計測端末のベースURL(例: http://env-marure.local)。
+    /// 環境計測端末のベースURL(例: http://env-measure.local)。
     /// </summary>
-    public string SensorBaseUrl { get; set; } = "http://env-marure.local";
+    public string SensorBaseUrl { get; set; } = "http://env-measure.local";
 
     /// <summary>
     /// LCDが接続されているI2CバスID。

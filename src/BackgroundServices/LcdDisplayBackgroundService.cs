@@ -28,18 +28,25 @@ public sealed class LcdDisplayBackgroundService : BackgroundService
 
         do
         {
+            using var scope = _scopeFactory.CreateScope();
+            var sensorClient = scope.ServiceProvider.GetRequiredService<IEnvironmentSensorClient>();
+            var lcdDisplay = scope.ServiceProvider.GetRequiredService<ILcdDisplay>();
+
             try
             {
-                using var scope = _scopeFactory.CreateScope();
-                var sensorClient = scope.ServiceProvider.GetRequiredService<IEnvironmentSensorClient>();
-                var lcdDisplay = scope.ServiceProvider.GetRequiredService<ILcdDisplay>();
-
                 var snapshot = await sensorClient.GetCurrentAsync(stoppingToken).ConfigureAwait(false);
                 lcdDisplay.Show(DateTime.Now, snapshot);
+            }
+            catch (HttpRequestException ex)
+            {
+                // 環境計測端末への接続失敗は高頻度で発生しうるため、スタックトレースなしの簡潔なログに留める
+                _logger.LogWarning("環境計測端末への接続に失敗しました: {Message}", ex.Message);
+                lcdDisplay.ShowError();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "LCDディスプレイへの表示に失敗しました。");
+                lcdDisplay.ShowError();
             }
         }
         while (await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false));

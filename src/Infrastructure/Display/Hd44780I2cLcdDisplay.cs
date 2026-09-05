@@ -30,6 +30,11 @@ public sealed class Hd44780I2cLcdDisplay : ILcdDisplay, IDisposable
             var lcdInterface = LcdInterface.CreateI2c(_i2cDevice, false);
             _lcd = new Lcd1602(lcdInterface) { BacklightOn = true };
             _lcd.Clear();
+            // 最初の計測値表示までのつなぎ表示。Show/ShowErrorが全桁上書きするためClear不要
+            _lcd.SetCursorPosition(0, 0);
+            _lcd.Write("Booting...");
+            _lcd.SetCursorPosition(0, 1);
+            _lcd.Write("Please wait");
         }
         catch (Exception ex)
         {
@@ -47,7 +52,8 @@ public sealed class Hd44780I2cLcdDisplay : ILcdDisplay, IDisposable
 
         // 1行目: (hh:mm)9999.9hPa / 2行目: 99.9°C  999.9%
         var line1 = $"({localTime:HH:mm}){snapshot.Pressure,6:0.0}hPa";
-        var line2 = $"  {snapshot.TempC,4:0.0}C   {snapshot.Humidity,5:0.0}%";
+        // TempCは氷点下になり得るため、正の数側にリテラル空白を1つ入れて符号分の桁を確保する
+        var line2 = $" {snapshot.TempC,5: 0.0;-0.0}C   {snapshot.Humidity,5:0.0}%";
 
         _lcd.SetCursorPosition(0, 0);
         _lcd.Write(line1);

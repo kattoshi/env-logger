@@ -49,16 +49,12 @@ public sealed class LoggerBackgroundService : BackgroundService
 
     /// <summary>
     /// 次の10分刻み(0,10,20,30,40,50分)の実行時刻までの待機時間を計算します。
+    /// 起動直後に即時実行されないよう、必ず次の刻みまで待機します。
     /// </summary>
     private static TimeSpan GetDelayUntilNextTick(DateTime nowUtc)
     {
-        var minutesPastTick = nowUtc.Minute % 10;
-        var next = nowUtc
-            .AddMinutes(-minutesPastTick)
-            .AddSeconds(-nowUtc.Second)
-            .AddMilliseconds(-nowUtc.Millisecond)
-            .Add(Interval);
-
+        // ミリ秒未満まで切り捨てるためTicks単位で丸める
+        var next = new DateTime(nowUtc.Ticks - (nowUtc.Ticks % Interval.Ticks), nowUtc.Kind).Add(Interval);
         return next - nowUtc;
     }
 }

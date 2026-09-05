@@ -7,6 +7,8 @@ namespace EnvLogger.Api.BackgroundServices;
 /// </summary>
 public sealed class LcdDisplayBackgroundService : BackgroundService
 {
+    private static readonly TimeSpan Interval = TimeSpan.FromMinutes(1);
+
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<LcdDisplayBackgroundService> _logger;
 
@@ -24,9 +26,7 @@ public sealed class LcdDisplayBackgroundService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
-
-        do
+        while (!stoppingToken.IsCancellationRequested)
         {
             using var scope = _scopeFactory.CreateScope();
             var sensorClient = scope.ServiceProvider.GetRequiredService<IEnvironmentSensorClient>();
@@ -48,7 +48,25 @@ public sealed class LcdDisplayBackgroundService : BackgroundService
                 _logger.LogError(ex, "LCDディスプレイへの表示に失敗しました。");
                 lcdDisplay.ShowError();
             }
+
+            try
+            {
+                await Task.Delay(GetDelayUntilNextMinute(DateTime.Now), stoppingToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false));
+    }
+
+    /// <summary>
+    /// 次の毎分0秒までの待機時間を計算します。
+    /// </summary>
+    private static TimeSpan GetDelayUntilNextMinute(DateTime now)
+    {
+        // ミリ秒未満まで切り捨てるためTicks単位で丸める
+        var next = new DateTime(now.Ticks - (now.Ticks % Interval.Ticks), now.Kind).Add(Interval);
+        return next - now;
     }
 }

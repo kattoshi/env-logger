@@ -19,7 +19,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// デフォルトファイルと静的ファイルを配信
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
     .WithName("GetHealth");
@@ -37,5 +39,7 @@ app.MapGet("/api/history", async (DateTimeOffset start, DateTimeOffset end, int?
     return Results.Ok(response);
 })
     .WithName("GetHistory");
+
+app.MapFallbackToFile("index.html");
 
 app.Run();

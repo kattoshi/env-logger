@@ -105,6 +105,26 @@ REST API サーバーとして、以下のサービスを準備する
     }
     ```
 
+#### Angular SPA の配信
+Angular でビルドした SPA は、`src/wwwroot` の直下へ配置することで EnvLogger から配信できる。
+
+```text
+src/
+  wwwroot/
+    index.html
+    browser.js などのビルド成果物
+```
+
+Angular のビルド成果物に `dist/<プロジェクト名>/browser` が作成される構成の場合は、`browser` ディレクトリの中身を `src/wwwroot` へコピーする。アプリケーションのベース URL は `/` とする。
+
+```bash
+ng build --base-href=/ --deploy-url=/
+```
+
+`dotnet publish -c Release` を実行すると、`src/wwwroot` の内容が `publish/wwwroot` にコピーされる。`env-logger.service` は HTTP の 80 番ポートで動作するため、画面は `http://env-monitor.local/`、API は `http://env-monitor.local/api/health` でアクセスする。
+
+SPA のクライアント側ルーティングにも対応しており、`/history` などの画面 URL を直接開いた場合も `index.html` が返却される。`/api/*` の API ルートは引き続き API として処理される。
+
 #### LCDモニター表示
 - 機能
   ラスペリパイ４のI2Cで接続した、1602LCDキャラクターディスプレイに現在値を表示します。

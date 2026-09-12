@@ -104,6 +104,12 @@ REST API サーバーとして、以下のサービスを準備する
         ]       
     }
     ```
+- 現在値取得
+  - パス：GET /api/current  
+  - パラメタ  
+    なし  
+  - レスポンス
+    env-measure.local の /current を行い、返却されたレスポンスをそのまま返却する  
 
 #### Angular SPA の配信
 Angular でビルドした SPA は、`src/wwwroot` の直下へ配置することで EnvLogger から配信できる。
